@@ -1,0 +1,8 @@
+spring:
+  graphql:
+    graphiql:
+      enabled: false
+      path: /software/udl/graphql/sg1/graphiql
+    path: /software/udl/graphql/sg1/graphql
+    websocket:
+      path: /software/udl/graphql/sg1/subscriptions
