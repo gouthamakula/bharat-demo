@@ -27,7 +27,7 @@
             "react/jsx-runtime": "https://esm.sh/react@19.1.0/jsx-runtime",
             "react-dom": "https://esm.sh/react-dom@19.1.0",
             "react-dom/client": "https://esm.sh/react-dom@19.1.0/client",
-            "graphiql": "/software/udl/graphql/sg1/graphiql/graphiql.js",
+            "graphiql": "https://esm.sh/graphiql@4.0.0?standalone&external=react,react/jsx-runtime,react-dom,@graphiql/react",
             "@graphiql/plugin-explorer": "https://esm.sh/@graphiql/plugin-explorer@4.0.0?standalone&external=react,react/jsx-runtime,react-dom,@graphiql/react,graphql",
             "@graphiql/react": "https://esm.sh/@graphiql/react@0.30.0?standalone&external=react,react/jsx-runtime,react-dom,graphql,@graphiql/toolkit",
             "@graphiql/toolkit": "https://esm.sh/@graphiql/toolkit@0.11.2?standalone&external=graphql",
@@ -43,9 +43,9 @@
         import { explorerPlugin } from '@graphiql/plugin-explorer';
 
         const params = new URLSearchParams(window.location.search);
-        const path = params.get("path") || "/graphql";
+        const path = params.get("path") || "/software/udl/graphql/sg1/graphql";
         const url = `${location.protocol}//${location.host}${path}`;
-        const wsPath = params.get("wsPath") || "/graphql";
+        const wsPath = params.get("wsPath") || "/software/udl/graphql/sg1/graphql";
         const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
         const subscriptionUrl = `${wsProtocol}//${location.host}${wsPath}`;
         const gqlFetcher = createGraphiQLFetcher({'url': url, 'subscriptionUrl': subscriptionUrl});

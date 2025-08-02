@@ -1,0 +1,17 @@
+FROM eclipse-temurin:17-jre-alpine
+
+# Set a non-root user (recommended)
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+# Set working directory
+WORKDIR /app
+
+# Copy the jar built externally
+COPY target/demo1-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose the port your app runs on
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]

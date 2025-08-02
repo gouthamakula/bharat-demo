@@ -2,7 +2,12 @@ spring:
   graphql:
     graphiql:
       enabled: false
-      path: /software/udl/graphql/sg1/graphiql
-    path: /software/udl/graphql/sg1/graphql
     websocket:
-      path: /software/udl/graphql/sg1/subscriptions
+      path: /software/udl/graphql/sg1/graphql
+    path: /software/udl/graphql/sg1/graphql
+    cache:
+      type: redis
+      host: localhost
+      port: 6371
+      redis:
+        time-to-live: 60000

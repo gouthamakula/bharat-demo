@@ -1,0 +1,2 @@
+/* esm.sh - graphiql@4.0.0 */
+export * from "/graphiql@4.0.0/X-ZUBncmFwaGlxbC9yZWFjdCxyZWFjdCxyZWFjdC1kb20scmVhY3QvanN4LXJ1bnRpbWU/es2022/graphiql.bundle.mjs";

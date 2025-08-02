@@ -1,11 +1,16 @@
 type Query {
-    books: String
+    getBooks(vaIds: [String], saId: String): Book
 }
 
 
 type Book {
     title: String
-    author: Author
+    author: Int
+    field: WorkingField
+}
+
+type WorkingField {
+    uuid: String
 }
 
 type Author {
