@@ -66,7 +66,6 @@ public class SpringSecurityConfig {
         protected FetchedValue unboxPossibleDataFetcherResult(ExecutionContext executionContext,
                                                               ExecutionStrategyParameters parameters,
                                                               Object result) {
-            System.out.println("Test UnbBoxPossible");
             if (result instanceof BookController.Book) {
                 AccessFieldNullifier.nullifyAccessAnnotatedFields(result);
 //                return super.unboxPossibleDataFetcherResult(executionContext, parameters, (Object) BookController.Book.builder().title("test working").build());
@@ -76,7 +75,6 @@ public class SpringSecurityConfig {
 
 
         protected BiConsumer<List<ExecutionResult>, Throwable> handleResults(ExecutionContext executionContext, List<String> fieldNames, CompletableFuture<ExecutionResult> overallResult) {
-            System.out.println("Test");
             return super.handleResults(executionContext, fieldNames, overallResult);
         }
     }

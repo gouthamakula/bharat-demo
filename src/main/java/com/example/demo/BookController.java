@@ -1,9 +1,12 @@
 package com.example.demo;
 
 
+import com.example.demo.offlinequery.OfflineQuery;
+import com.example.demo.offlinequery.OfflineQueryRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
@@ -63,17 +66,39 @@ public class BookController {
     @Builder
     static class Book {
         public String title;
+        public String requestId;
         public Integer author;
-        @JsonIgnore(value=false)
+        @JsonIgnore(value=true)
         public WorkingField field;
     }
 
+    @Autowired
+    private OfflineQueryRepository repository;
+
     @QueryMapping
     @PreAuthorize("@accessValidator.validationService(#vaIds, #saId)")
-    public Book getBooks(@Argument List<String> vaIds, @Argument String saId) {
-        SecurityContextHolder.getContext();
+    public Book getBooks(@Argument List<String> vaIds, @Argument String saId, @Argument Boolean offlineMode) {
+        if (offlineMode) {
+            String requestId = processOfflineQuery("testQuery" + saId);
+            return Book.builder().requestId(requestId).build();
+        }
         System.out.println(applicationContext.getBeanDefinitionNames());
         return Book.builder().title("title1").author(1).field(new WorkingField(UUID.randomUUID().toString())).build();
     }
+
+    public String processOfflineQuery(String graphqlQuery) {
+        String requestId = java.util.UUID.randomUUID().toString();
+
+        OfflineQuery query = OfflineQuery.builder()
+                .requestId(requestId)
+                .queryText(graphqlQuery)
+                .timestamp(java.time.Instant.now())
+                .status("PENDING")
+                .build();
+
+        this.repository.save(query);
+        return requestId;
+    }
+
 
 }
