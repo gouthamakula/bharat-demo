@@ -1,18 +1,25 @@
 package com.example.demo.offlinequery;
 
 
-import lombok.RequiredArgsConstructor;
+import com.example.demo.BookController;
+import com.example.demo.offlinequery.storage.S3StorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.Argument;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
-@RequiredArgsConstructor
 public class OfflineQueryResolver {
 
-    private final OfflineQueryRepository repository;
+    @Autowired
+    private OfflineQueryRepository repository;
+    @Autowired
+    private S3StorageService s3StorageService;
 
     // 1. Return list of previous queries
     @QueryMapping
@@ -25,7 +32,7 @@ public class OfflineQueryResolver {
     public OfflineQueryStatus getOfflineQueryStatus(
             @Argument String requestId,
             @Argument Boolean getData
-    ) {
+    ) throws IOException {
         OfflineQuery query = repository.findByRequestId(requestId)
                 .orElseThrow(() -> new RuntimeException("Query not found"));
 
@@ -33,10 +40,19 @@ public class OfflineQueryResolver {
         status.setRequestId(query.getRequestId());
         status.setStatus(query.getStatus());
         status.setS3Link("");
+        if (getData) {
+            status.setResults(
+                    new ObjectMapper().convertValue(
+                        s3StorageService.downloadZippedObject(requestId, BookController.Book.class),
+                        HashMap.class
+                    )
+            );
+        }
 
         if ("COMPLETED".equals(query.getStatus()) && Boolean.TRUE.equals(getData)) {
             status.setResults(null);
         }
+        status.setS3Link(s3StorageService.generatePresignedUrl(requestId));
 
         return status;
     }

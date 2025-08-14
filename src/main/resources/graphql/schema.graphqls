@@ -8,21 +8,19 @@ type Query {
     # 2. Get status or results
     getOfflineQueryStatus(requestId: String!, getData: Boolean = false): OfflineQueryStatus!
 
-    # 3. Get original query text
-    getOfflineQueryText(requestId: String!): String!
 }
 
 type OfflineQueryInfo {
-    requestId: String!
-    queryText: String!
-    timestamp: String!
-    status: String!
+    requestId: String
+    queryText: String
+    timestamp: String
+    status: String
     s3Link: String
 }
 
 type OfflineQueryStatus {
-    requestId: String!
-    status: String!
+    requestId: String
+    status: String
     s3Link: String
     results: JSON
 }

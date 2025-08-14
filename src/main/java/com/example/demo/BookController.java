@@ -3,6 +3,7 @@ package com.example.demo;
 
 import com.example.demo.offlinequery.OfflineQuery;
 import com.example.demo.offlinequery.OfflineQueryRepository;
+import com.example.demo.offlinequery.storage.S3StorageService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
@@ -51,38 +54,40 @@ class accessValidator {
 @Controller
 public class BookController {
 
-    @Autowired
-    ApplicationContext applicationContext;
-
     @AllArgsConstructor
-    static class WorkingField {
+    @NoArgsConstructor
+    public static class WorkingField implements Serializable {
         String uuid;
     }
 
-    @Autowired
-    CacheManager cacheManager;
-
     @Data
     @Builder
-    static class Book {
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Book implements Serializable {
         public String title;
         public String requestId;
         public Integer author;
-        @JsonIgnore(value=true)
         public WorkingField field;
     }
 
     @Autowired
     private OfflineQueryRepository repository;
+    @Autowired
+    private S3StorageService s3StorageService;
+
 
     @QueryMapping
     @PreAuthorize("@accessValidator.validationService(#vaIds, #saId)")
-    public Book getBooks(@Argument List<String> vaIds, @Argument String saId, @Argument Boolean offlineMode) {
+    public Book getBooks(@Argument List<String> vaIds, @Argument String saId, @Argument Boolean offlineMode) throws IOException {
         if (offlineMode) {
             String requestId = processOfflineQuery("testQuery" + saId);
-            return Book.builder().requestId(requestId).build();
+            Book book = Book.builder().requestId(requestId).title(
+                    "saId: " + saId + " vaIds: " + vaIds
+            ).build();
+            s3StorageService.uplaodZippedObject(requestId, book);
+            return book;
         }
-        System.out.println(applicationContext.getBeanDefinitionNames());
         return Book.builder().title("title1").author(1).field(new WorkingField(UUID.randomUUID().toString())).build();
     }
 
